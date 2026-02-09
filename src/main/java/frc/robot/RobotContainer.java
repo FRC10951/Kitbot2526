@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import static frc.robot.Constants.OperatorConstants.*;
+import static frc.robot.Constants.FuelConstants.*;
 import frc.robot.commands.Drive;
 import frc.robot.commands.Eject;
 import frc.robot.commands.ExampleAuto;
@@ -67,13 +68,17 @@ public class RobotContainer {
 
     // While the left bumper on operator controller is held, intake Fuel
     operatorController.leftBumper().whileTrue(new Intake(fuelSubsystem));
-    // While the X button on the operator controller is held, intake Fuel
-    operatorController.x().whileTrue(new Intake(fuelSubsystem));
-    // While the right bumper on the operator controller is held, spin up for 1
+    // X button: run CAN ID 9 (feeder) only while held
+    operatorController.x().whileTrue(
+        fuelSubsystem.run(() -> fuelSubsystem.setFeederRoller(INTAKING_FEEDER_VOLTAGE))
+            .finallyDo(interrupted -> fuelSubsystem.setFeederRoller(0)));
+    // While the right bumper on operator controller is held, spin up for 1
     // second, then launch fuel. When the button is released, stop.
     operatorController.rightBumper().whileTrue(new LaunchSequence(fuelSubsystem));
-    // While the Y button on the operator controller is held, spin up then launch fuel
-    operatorController.y().whileTrue(new LaunchSequence(fuelSubsystem));
+    // Y button: run CAN ID 19 (intake/launcher) only while held
+    operatorController.y().whileTrue(
+        fuelSubsystem.run(() -> fuelSubsystem.setIntakeLauncherRoller(INTAKING_INTAKE_VOLTAGE))
+            .finallyDo(interrupted -> fuelSubsystem.setIntakeLauncherRoller(0)));
     // While the A button is held on the operator controller, eject fuel back out
     // the intake
     operatorController.a().whileTrue(new Eject(fuelSubsystem));
