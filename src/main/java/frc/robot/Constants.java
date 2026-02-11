@@ -58,4 +58,19 @@ public final class Constants {
     public static final double DRIVE_SCALING = .7;
     public static final double ROTATION_SCALING = .8;
   }
+
+  public static final class VisionConstants {
+    // Limelight camera name (must match network tables configuration)
+    public static final String LIMELIGHT_NAME = "limelight";
+
+    // Maximum rotations per second threshold for accepting vision measurements
+    // Robot must be rotating slower than this to trust vision data
+    public static final double MAX_ANGULAR_VELOCITY_RPS = 2.0;
+
+    // Proportional gain for AprilTag rotation alignment
+    // Higher = more aggressive rotation, Lower = smoother but slower
+    // Recommended range: 0.02 - 0.05
+    public static final double VISION_ROTATION_KP = 0.03;
+  }
+
 }

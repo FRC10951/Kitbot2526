@@ -4,6 +4,10 @@
 
 package frc.robot;
 
+import frc.robot.LimelightHelpers;
+import frc.robot.subsystems.CANDriveSubsystem;
+import edu.wpi.first.math.util.Units;
+
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -60,7 +64,20 @@ public class Robot extends TimedRobot {
     // robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
+
+    // Continuously update robot pose using Limelight AprilTag detections
+    CANDriveSubsystem drive = m_robotContainer.getDriveSubsystem();
+    if (drive != null) {
+        double omegaRps = drive.getAngularVelocity();
+        var llMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
+
+        // Update pose if: tags are visible, robot isn't spinning too fast
+        if (llMeasurement != null && llMeasurement.tagCount > 0 && omegaRps < 2.0) {
+            drive.addVisionMeasurement(llMeasurement.pose, llMeasurement.timestampSeconds);
+        }
+    }
   }
+
 
   /** This function is called once each time the robot enters Disabled mode. */
   @Override

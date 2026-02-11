@@ -18,6 +18,10 @@ import frc.robot.commands.LaunchSequence;
 import frc.robot.subsystems.CANDriveSubsystem;
 import frc.robot.subsystems.CANFuelSubsystem;
 
+import frc.robot.LimelightHelpers;
+import frc.robot.commands.VisionAlign;
+
+
 /**
  * This class is where the bulk of the robot should be declared. Since
  * Command-based is a "declarative" paradigm, very little robot logic should
@@ -54,6 +58,16 @@ public class RobotContainer {
   }
 
   /**
+   * Returns the drive subsystem for vision integration.
+   *
+   * @return The CANDriveSubsystem instance
+   */
+  public CANDriveSubsystem getDriveSubsystem() {
+      return driveSubsystem;
+  }
+
+
+  /**
    * Use this method to define your trigger->command mappings. Triggers can be
    * created via the {@link Trigger#Trigger(java.util.function.BooleanSupplier)}
    * constructor with an arbitrary predicate, or via the named factories in
@@ -68,16 +82,16 @@ public class RobotContainer {
 
     // While the left bumper on operator controller is held, intake Fuel
     operatorController.leftBumper().whileTrue(new Intake(fuelSubsystem));
-    // X button: run CAN ID 9 (feeder) only while held
+    // X button: run CAN ID 9 (feeder) at shooting speed while held
     operatorController.x().whileTrue(
-        fuelSubsystem.run(() -> fuelSubsystem.setFeederRoller(INTAKING_FEEDER_VOLTAGE))
+        fuelSubsystem.run(() -> fuelSubsystem.setFeederRoller(LAUNCHING_FEEDER_VOLTAGE))
             .finallyDo(interrupted -> fuelSubsystem.setFeederRoller(0)));
     // While the right bumper on operator controller is held, spin up for 1
     // second, then launch fuel. When the button is released, stop.
     operatorController.rightBumper().whileTrue(new LaunchSequence(fuelSubsystem));
-    // Y button: run CAN ID 19 (intake/launcher) only while held
+    // Y button: run CAN ID 19 (intake/launcher) at shooting speed while held
     operatorController.y().whileTrue(
-        fuelSubsystem.run(() -> fuelSubsystem.setIntakeLauncherRoller(INTAKING_INTAKE_VOLTAGE))
+        fuelSubsystem.run(() -> fuelSubsystem.setIntakeLauncherRoller(LAUNCHING_LAUNCHER_VOLTAGE))
             .finallyDo(interrupted -> fuelSubsystem.setIntakeLauncherRoller(0)));
     // While the A button is held on the operator controller, eject fuel back out
     // the intake
@@ -91,6 +105,18 @@ public class RobotContainer {
     driveSubsystem.setDefaultCommand(new Drive(driveSubsystem, driverController));
 
     fuelSubsystem.setDefaultCommand(fuelSubsystem.run(() -> fuelSubsystem.stop()));
+
+    // DRIVER CONTROLS - Vision-assisted rotation
+    // Hold LEFT BUMPER on driver controller: Auto-rotate toward AprilTag
+    driverController.leftBumper().whileTrue(
+        new VisionAlign(driveSubsystem, driverController)
+    );
+
+    // Press RIGHT BUMPER on driver controller: Reset gyro heading to 0°
+    driverController.rightBumper().onTrue(
+        driveSubsystem.runOnce(() -> driveSubsystem.resetHeading())
+    );
+
   }
 
   /**
