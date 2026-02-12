@@ -27,6 +27,24 @@ public final class Constants {
     public static final int DRIVE_MOTOR_CURRENT_LIMIT = 60;
   }
 
+  public static final class IoConstants {
+    public static final int IO_MOTOR_ID = 9;
+    public static final int LOADER_MOTOR_ID = 19;
+
+    public static final int IO_MOTOR_CURRENT_LIMIT = 60;
+    public static final int LOADER_MOTOR_CURRENT_LIMIT = 60;
+
+    public static final double INTAKING_IO_VOLTAGE = -12;
+    public static final double INTAKING_LOADER_VOLTAGE = 10;
+
+    public static final double PREPARING_IO_VOLTAGE = -6;
+    public static final double PREPARING_LOADER_VOLTAGE = 0;
+
+    public static final double LAUNCHING_IO_VOLTAGE = 12;
+    public static final double LAUNCHING_LOADER_VOLTAGE = 10;
+  }
+
+  // TODO: delete this once CANFuelSubsytem is removed
   public static final class FuelConstants {
     // Motor controller IDs for Fuel Mechanism motors
     public static final int FEEDER_MOTOR_ID = 9;
