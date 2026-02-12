@@ -10,12 +10,9 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import static frc.robot.Constants.OperatorConstants.*;
-<<<<<<< HEAD
 import static frc.robot.Constants.FuelConstants.*;
-=======
 
 import frc.robot.commands.AutoDrive;
->>>>>>> 44537bc (feat: thursday)
 import frc.robot.commands.Drive;
 import frc.robot.commands.Eject;
 import frc.robot.commands.ExampleAuto;
@@ -61,11 +58,12 @@ public class RobotContainer {
     // Set the options to show up in the Dashboard for selecting auto modes. If you
     // add additional auto modes you can add additional lines here with
     // autoChooser.addOption 
-    autoChooser.addOption("Leftmost", 
-    new AutoDrive(driveSubsystem,0.5,  0.0).withTimeout(.25).andThen(new SpinUp(fuelSubsystem))
+    autoChooser.addOption(
+      "Autoaim", 
+      new AutoDrive(driveSubsystem,0.5,  0.0).withTimeout(.25)
+        .andThen(new VisionAlign(driveSubsystem, driverController))
+        .andThen(new SpinUp(fuelSubsystem))
     );
-    autoChooser.addOption("Center", new ExampleAuto(driveSubsystem, fuelSubsystem));
-    autoChooser.addOption("Rightmost", new ExampleAuto(driveSubsystem, fuelSubsystem));
     autoChooser.addOption("Example", new ExampleAuto(driveSubsystem, fuelSubsystem));
     autoChooser.setDefaultOption("Do Nothing", Commands.none());
   }
